@@ -8,7 +8,7 @@ app.use(express.json())
 // app.use(cors())
 app.use(cors(
     {
-        origin: ["https://deploy-mern-frontend.vercel.app"],
+        origin: ["https://movie-recommendation.vercel.app"],
         methods: ["POST", "GET"],
         credentials: true
     }
