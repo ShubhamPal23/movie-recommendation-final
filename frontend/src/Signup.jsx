@@ -10,7 +10,7 @@ export const Signup = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  axios.defaults.withCredentials = true;
+
 
   const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,6 +28,7 @@ export const Signup = () => {
       return;
     }
     setError('');
+    axios.defaults.withCredentials = true;
     axios
       .post("https://movie-recommendation-backend-one.vercel.app/register", { name, email, password })
       .then((result) => {
