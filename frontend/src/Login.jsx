@@ -7,11 +7,11 @@ function Login() {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const navigate = useNavigate();
-
+axios.default.withCredentials=true;
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("http://localhost:3001/login", { email, password })
+      .post("https://movie-recommendation-backend-one.vercel.app/login", { email, password })
       .then((result) => {
         if (result.data.status === "Success") {
           // Save user info to localStorage
