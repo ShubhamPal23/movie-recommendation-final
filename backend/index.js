@@ -5,8 +5,14 @@ const EmployeeModel = require('./models/Employee')
 
 const app = express()
 app.use(express.json())
-app.use(cors())
-
+// app.use(cors())
+app.use(cors(
+    {
+        origin: ["https://deploy-mern-frontend.vercel.app"],
+        methods: ["POST", "GET"],
+        credentials: true
+    }
+));
 
 mongoose.connect("mongodb+srv://ripper2323:ripper%2623bham@cluster1.ipj8t.mongodb.net/employee", {
     useNewUrlParser: true,
