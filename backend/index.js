@@ -21,6 +21,10 @@ mongoose.connect("mongodb+srv://ripper2323:ripper%2623bham@cluster1.ipj8t.mongod
   .then(() => console.log("Connected to MongoDB"))
   .catch((error) => console.error("MongoDB connection error:", error));
 
+app.get("/", (req, res) => {
+    res.json("Welcome to movie-recommendation");
+})
+
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
     EmployeeModel.findOne({ email: email })
