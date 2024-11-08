@@ -7,7 +7,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cors({
-    origin: "*",
+    origin: "https://movie-recommendation-theta-hazel.vercel.app/",
     methods: ["POST", "GET", "OPTIONS"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
