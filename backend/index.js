@@ -1,30 +1,28 @@
-const express = require("express")
-const mongoose = require('mongoose')
-const cors = require('cors')
-const EmployeeModel = require('./models/Employee')
+const express = require("express");
+const mongoose = require('mongoose');
+const cors = require('cors');
+const EmployeeModel = require('./models/Employee');
 
-const app = express()
-app.use(express.json())
-// app.use(cors())
-axios.defaults.withCredentials = true;
-app.use(cors(
-    {
-        origin: ["https://movie-recommendation-theta-hazel.vercel.app"],
-        methods: ["POST", "GET"],
-        credentials: true
-    }
-));
+const app = express();
+
+app.use(express.json());
+app.use(cors({
+    origin: "https://movie-recommendation-theta-hazel.vercel.app",
+    methods: ["POST", "GET", "OPTIONS"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
 
 mongoose.connect("mongodb+srv://ripper2323:ripper%2623bham@cluster1.ipj8t.mongodb.net/employee", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-  })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((error) => console.error("MongoDB connection error:", error));
+})
+.then(() => console.log("Connected to MongoDB"))
+.catch((error) => console.error("MongoDB connection error:", error));
 
 app.get("/", (req, res) => {
     res.json("Welcome to movie-recommendation");
-})
+});
 
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
@@ -43,15 +41,13 @@ app.post('/login', (req, res) => {
         .catch(err => res.json({ status: "Error", message: err.message }));
 });
 
-
 app.post('/register', (req, res) => {
     EmployeeModel.create(req.body)
         .then(employees => res.json(employees))
-        .catch(err => res.json(err))
-})
+        .catch(err => res.json(err));
+});
 
-
-
-app.listen(3001, () => {
-    console.log("server is running")
-})
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
