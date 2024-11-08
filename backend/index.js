@@ -6,6 +6,7 @@ const EmployeeModel = require('./models/Employee')
 const app = express()
 app.use(express.json())
 // app.use(cors())
+axios.defaults.withCredentials = true;
 app.use(cors(
     {
         origin: ["https://movie-recommendation-theta-hazel.vercel.app"],
