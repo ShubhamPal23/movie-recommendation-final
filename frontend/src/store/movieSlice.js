@@ -5,10 +5,12 @@ const movieSlice = createSlice({
   initialState: {
     movies: [],
     filteredMovies: [],
+    isMoviesLoaded: false, 
   },
   reducers: {
     setMovies: (state, action) => {
       state.movies = action.payload;
+      state.isMoviesLoaded = true; 
     },
     setFilteredMovies: (state, action) => {
       state.filteredMovies = action.payload;
