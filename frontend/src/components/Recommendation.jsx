@@ -10,8 +10,10 @@ const Recommendation = () => {
   const dispatch = useDispatch();
   const { movies, filteredMovies } = useSelector((state) => state.movie);
   const [keyword, setKeyword] = useState('');
+  const [sortByYear, setSortByYear] = useState(true); 
 
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (movies.length === 0) {
       const loadCSV = async (fileName) => {
@@ -60,55 +62,94 @@ const Recommendation = () => {
     }
   }, [dispatch, movies.length]);
 
-  const handleRecommend = (newkeyword=keyword) => {
+  const handleRecommend = (newkeyword = keyword) => {
     if (keyword.trim() === '') {
       dispatch(setFilteredMovies([]));
     } else {
-      const lowerKeyword = newkeyword.toLowerCase();
-      const results = movies.filter((movie) =>
-        Object.values(movie).some((value) =>
-          String(value).toLowerCase().includes(lowerKeyword)
+      const keywordsArray = newkeyword.toLowerCase().split(' '); 
+      let results = movies.filter((movie) =>
+        keywordsArray.some((kw) =>
+          Object.values(movie).some((value) =>
+            String(value).toLowerCase().includes(kw)
+          )
         )
       );
+  
+      if (sortByYear) {
+        results = results.sort((a, b) => {
+          const yearA = parseInt(a.movieYear, 10) || 0;
+          const yearB = parseInt(b.movieYear, 10) || 0;
+          return yearB - yearA;
+        });
+      }
+  
       dispatch(setFilteredMovies(results));
-      navigate(`/recommendation?keyword=${newkeyword}`)
+      navigate(`/recommendation?keyword=${newkeyword}`);
     }
   };
+
   return (
     <div id="recommendation">
       <div>
-        <h2 style={{textAlign:"center", marginTop:"20px"}}>Find Your Perfect Movie</h2>
+        <h2 style={{ textAlign: 'center', marginTop: '20px' }}>Find Your Perfect Movie</h2>
       </div>
       <div>
         <input
-        type="text"
-        placeholder="Type a movie keyword..."
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        className="recommend-input"
+          type="text"
+          placeholder="Type a movie keyword..."
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          className="recommend-input"
         />
-        <button onClick={()=>handleRecommend(keyword)} style={{marginBottom:"30px"}} className="search-button">Recommend</button>
+        <button onClick={() => handleRecommend(keyword)} style={{ marginBottom: '30px' }} className="search-button">
+          Recommend
+        </button>
       </div>
-    
+      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={sortByYear}
+            onChange={() => setSortByYear((prev) => !prev)}
+          />
+          Sort by Latest Year
+        </label>
+      </div>
       <div>
         {filteredMovies.length > 0 ? (
           filteredMovies.map((movie) => (
-            <div key={movie.movieId} className='last-work' >
+            <div key={movie.movieId} className="last-work">
               <div className="recom-img">
-                <img onClick={()=>{navigate(`/recommendation/${encodeURIComponent(movie.movieTitle)}`)}} src={movie.imageLink} alt={movie.movieTitle} />
+                <img
+                  onClick={() => {
+                    navigate(`/recommendation/${encodeURIComponent(movie.movieTitle)}`);
+                  }}
+                  src={movie.imageLink}
+                  alt={movie.movieTitle}
+                />
               </div>
               <div className="recom-details">
-              <a style={{textDecoration:"none", cursor:"pointer"}} onClick={()=>{navigate(`/recommendation/${encodeURIComponent(movie.movieTitle)}`)}}><h3 style={{color:"black" }}><strong>{movie.movieTitle}</strong> </h3></a>
-                <p style={{color:"black"}}> {movie.genres || 'N/A'}</p>
-                <p className="recom-overview" style={{color:"black",marginTop:"20px",fontSize:"1rem"}}> {movie.overview || 'N/A'}</p>
+                <a
+                  style={{ textDecoration: 'none', cursor: 'pointer' }}
+                  onClick={() => {
+                    navigate(`/recommendation/${encodeURIComponent(movie.movieTitle)}`);
+                  }}
+                >
+                  <h3 style={{ color: 'black' }}>
+                    <strong>{movie.movieTitle}</strong>
+                  </h3>
+                </a>
+                <p style={{ color: 'black' }}>{movie.genres || 'N/A'}</p>
+                <p className="recom-overview" style={{ color: 'black', marginTop: '20px', fontSize: '1rem' }}>
+                  {movie.overview || 'N/A'}
+                </p>
               </div>
             </div>
           ))
         ) : (
-          <div className="no-recom" style={{minHeight:"510px"}}>
+          <div className="no-recom" style={{ minHeight: '510px' }}>
             <p>No recommendations found</p>
           </div>
-          
         )}
       </div>
     </div>
