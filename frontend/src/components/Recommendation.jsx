@@ -1,72 +1,21 @@
-/* eslint-disable no-unused-vars */
-import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { setMovies, setFilteredMovies } from '../store/movieSlice';
-import Papa from 'papaparse';
-import './Recommendation.css';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { setFilteredMovies } from "../store/movieSlice";
+import { useNavigate } from "react-router-dom";
+import "./Recommendation.css";
 
 const Recommendation = () => {
   const dispatch = useDispatch();
   const { movies, filteredMovies } = useSelector((state) => state.movie);
-  const [keyword, setKeyword] = useState('');
-  const [sortByYear, setSortByYear] = useState(true); 
-
+  const [keyword, setKeyword] = useState("");
+  const [sortByYear, setSortByYear] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (movies.length === 0) {
-      const loadCSV = async (fileName) => {
-        return new Promise((resolve, reject) => {
-          Papa.parse(`/${fileName}`, {
-            download: true,
-            header: true,
-            complete: (result) => resolve(result.data),
-            error: (error) => reject(error),
-          });
-        });
-      };
-
-      const loadAllMovies = async () => {
-        try {
-          const movieData = await loadCSV('movies_with_image_links.csv');
-          const reviewData = await loadCSV('generated_movie_reviews.csv');
-          const movielink = await loadCSV('movies.csv');
-
-          const movieMap = new Map();
-          movieData.forEach((movie) => {
-            movieMap.set(movie.movieId, { ...movie });
-          });
-
-          reviewData.forEach((review) => {
-            const movieId = review.movieId;
-            if (movieMap.has(movieId)) {
-              movieMap.set(movieId, { ...movieMap.get(movieId), ...review });
-            }
-          });
-
-          movielink.forEach((link) => {
-            const movieId = link.movieId;
-            if (movieMap.has(movieId)) {
-              movieMap.set(movieId, { ...movieMap.get(movieId), ...link });
-            }
-          });
-
-          dispatch(setMovies([...movieMap.values()]));
-        } catch (error) {
-          console.error('Error loading CSV files:', error);
-        }
-      };
-
-      loadAllMovies();
-    }
-  }, [dispatch, movies.length]);
-
-  const handleRecommend = (newkeyword = keyword) => {
-    if (keyword.trim() === '') {
+  const handleRecommend = () => {
+    if (keyword.trim() === "") {
       dispatch(setFilteredMovies([]));
     } else {
-      const keywordsArray = newkeyword.toLowerCase().split(' '); 
+      const keywordsArray = keyword.toLowerCase().split(" ");
       let results = movies.filter((movie) =>
         keywordsArray.some((kw) =>
           Object.values(movie).some((value) =>
@@ -74,7 +23,7 @@ const Recommendation = () => {
           )
         )
       );
-  
+
       if (sortByYear) {
         results = results.sort((a, b) => {
           const yearA = parseInt(a.movieYear, 10) || 0;
@@ -82,41 +31,37 @@ const Recommendation = () => {
           return yearB - yearA;
         });
       }
-  
+
       dispatch(setFilteredMovies(results));
-      navigate(`/recommendation?keyword=${newkeyword}`);
+      navigate(`/recommendation?keyword=${encodeURIComponent(keyword)}`);
     }
   };
 
   return (
     <div id="recommendation">
-      <div>
-        <h2 style={{ textAlign: 'center', marginTop: '20px' }}>Find Your Perfect Movie</h2>
-      </div>
-      <div>
+      <h2 style={{ textAlign: "center", marginTop: "20px" }}>
+        Find Your Perfect Movie
+      </h2>
+      <input
+        type="text"
+        placeholder="Type a movie keyword..."
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+        className="recommend-input"
+      />
+      <button onClick={handleRecommend} className="search-button">
+        Recommend
+      </button>
+      <label>
         <input
-          type="text"
-          placeholder="Type a movie keyword..."
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-          className="recommend-input"
+          type="checkbox"
+          checked={sortByYear}
+          onChange={() => setSortByYear((prev) => !prev)}
         />
-        <button onClick={() => handleRecommend(keyword)} style={{ marginBottom: '30px' }} className="search-button">
-          Recommend
-        </button>
-      </div>
-      <div style={{ marginBottom: '20px', textAlign: 'center' }}>
-        <label>
-          <input
-            type="checkbox"
-            checked={sortByYear}
-            onChange={() => setSortByYear((prev) => !prev)}
-          />
-          Sort by Latest Year
-        </label>
-      </div>
+        Sort by Latest Year
+      </label>
       <div>
-        {filteredMovies.length > 0 ? (
+      {filteredMovies.length > 0 ? (
           filteredMovies.map((movie) => (
             <div key={movie.movieId} className="last-work">
               <div className="recom-img">
